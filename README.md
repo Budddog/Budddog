@@ -1,6 +1,6 @@
 - 👋 Hi, I’m @Budddog
 - 👀 I’m interested in Deflationary Economics
-- 🌱 I’m currently learning Solidity, Python, JS
+- 🌱 I’m proficient in  Solidity, Python, JS
 - 💞️ I’m looking to collaborate on Revolutions
 - 📫 How to reach me Twitter https://twitter.com/Buddd0g 
 
