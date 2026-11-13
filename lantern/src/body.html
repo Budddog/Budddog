@@ -1,0 +1,43 @@
+<div class="shell">
+  <header class="top">
+    <a class="brand" href="#today" aria-label="Lantern, go to Today">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6M8 5h8l2 5v8l-2 3H8l-2-3v-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M12 9c1.6 2 2.4 3.3 2.4 4.8a2.4 2.4 0 01-4.8 0c0-1.5.8-2.8 2.4-4.8z" class="flame"/></svg>
+      <span>Lantern</span>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#today" data-nav="today">Today</a>
+      <a href="#explore" data-nav="explore">Explore</a>
+      <a href="#library" data-nav="library">Stash</a>
+      <a href="#review" data-nav="review">Review<span id="due-badge" class="badge" hidden></span></a>
+      <a href="#you" data-nav="you">You</a>
+    </nav>
+    <a class="streak" id="streak" href="#you"></a>
+  </header>
+  <main id="view"></main>
+</div>
+
+<div id="reader" class="reader" role="dialog" aria-modal="true" aria-label="Idea reader" tabindex="-1" hidden>
+  <div class="reader-top">
+    <div id="reader-progress" class="progress" aria-hidden="true"></div>
+    <button class="round" data-a="close-reader" aria-label="Close reader"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+  </div>
+  <div class="reader-stage">
+    <button class="round side" id="rd-prev" data-a="prev" aria-label="Previous idea"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l-8 8 8 8"/></svg></button>
+    <div id="reader-body" class="reader-body"></div>
+    <button class="round side" id="rd-next" data-a="next" aria-label="Next idea"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4l8 8-8 8"/></svg></button>
+  </div>
+  <div id="reader-actions" class="reader-actions">
+    <button class="tool" id="act-save" data-a="save"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg><span class="lbl">Save</span></button>
+    <button class="tool" id="act-listen" data-a="listen"></button>
+    <button class="tool" data-a="note"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 20h4L20 8l-4-4L4 16zM14 6l4 4"/></svg><span class="lbl">Note</span></button>
+    <div class="share-wrap">
+      <button class="tool" data-a="share" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 13v7h14v-7"/></svg><span class="lbl">Share</span></button>
+      <div id="share-menu" class="menu" hidden>
+        <button data-a="share-copy">Copy as text</button>
+        <button data-a="share-image">Download as image</button>
+      </div>
+    </div>
+    <button class="btn next-btn" data-a="next">Next</button>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" hidden></div>
