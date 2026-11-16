@@ -222,6 +222,22 @@ textarea { resize: vertical; }
 .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 30; max-width: min(92vw, 420px); padding: 10px 18px; border-radius: 99px; background: var(--ink); color: var(--bg); font-weight: 550; text-align: center; }
 @keyframes rise { from { transform: translateY(8px); opacity: 0.6; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* watch mode: a deliberately dark, single-look video stage */
+.btn.big { padding: 14px 26px; font-size: 1.08rem; }
+.watch { position: fixed; inset: 0; z-index: 25; background: #05070d; display: flex; justify-content: center; }
+.watch:focus { outline: none; }
+.w-stage { position: relative; height: 100%; }
+.w-stage canvas { display: block; width: 100%; height: 100%; cursor: pointer; }
+.w-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 52px; padding: 8px 6px; border: 0; border-radius: 14px; background: rgb(0 0 0 / 0.38); color: #fff; font-size: 0.7rem; font-weight: 600; }
+.w-btn .ic { width: 24px; height: 24px; }
+.w-btn.on .ic { color: #ffbd2e; }
+#w-save.on .ic { fill: #ffbd2e; }
+.w-close { position: absolute; top: calc(34px + env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); min-width: 0; padding: 9px; border-radius: 50%; }
+.w-rail { position: absolute; right: max(10px, env(safe-area-inset-right, 0px)); bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; }
+.w-paused { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 12px 20px; border-radius: 99px; background: rgb(0 0 0 / 0.62); color: #fff; font-weight: 600; text-align: center; cursor: pointer; max-width: 80%; }
+.tool { min-width: 48px; }
+@media (max-width: 759px) { .tabs a { font-size: 0.84rem; padding-inline: 2px; } .next-btn { padding-inline: 18px; } }
 </style>
 <div class="shell">
   <header class="top">
@@ -231,6 +247,7 @@ textarea { resize: vertical; }
     </a>
     <nav class="tabs" aria-label="Sections">
       <a href="#today" data-nav="today">Today</a>
+      <a href="#watch" data-nav="watch">Watch</a>
       <a href="#explore" data-nav="explore">Explore</a>
       <a href="#library" data-nav="library">Stash</a>
       <a href="#review" data-nav="review">Review<span id="due-badge" class="badge" hidden></span></a>
@@ -255,6 +272,7 @@ textarea { resize: vertical; }
     <button class="tool" id="act-save" data-a="save"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg><span class="lbl">Save</span></button>
     <button class="tool" id="act-listen" data-a="listen"></button>
     <button class="tool" data-a="note"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 20h4L20 8l-4-4L4 16zM14 6l4 4"/></svg><span class="lbl">Note</span></button>
+    <button class="tool" data-a="watch-here"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M10 9l5 3-5 3z"/></svg><span class="lbl">Watch</span></button>
     <div class="share-wrap">
       <button class="tool" data-a="share" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 13v7h14v-7"/></svg><span class="lbl">Share</span></button>
       <div id="share-menu" class="menu" hidden>
@@ -263,6 +281,21 @@ textarea { resize: vertical; }
       </div>
     </div>
     <button class="btn next-btn" data-a="next">Next</button>
+  </div>
+</div>
+<div id="watch" class="watch" role="dialog" aria-modal="true" aria-label="Clip player" tabindex="-1" hidden>
+  <div id="watch-stage" class="w-stage">
+    <canvas id="watch-canvas" data-a="watch-toggle" aria-hidden="true"></canvas>
+    <p id="watch-live" class="sr" aria-live="polite"></p>
+    <p id="watch-paused" class="w-paused" data-a="watch-toggle" hidden></p>
+    <button class="w-btn w-close" data-a="watch-close" aria-label="Close player"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    <div class="w-rail">
+      <button class="w-btn" id="w-save" data-a="watch-save"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg><span class="lbl">Save</span></button>
+      <button class="w-btn" id="w-sound" data-a="watch-sound"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9zM17 9a4 4 0 010 6"/></svg><span class="lbl">Sound on</span></button>
+      <button class="w-btn" id="w-export" data-a="watch-export"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg><span class="lbl">Get video</span></button>
+      <button class="w-btn" data-a="watch-prev" aria-label="Previous clip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l7-7 7 7"/></svg></button>
+      <button class="w-btn" data-a="watch-next" aria-label="Next clip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg></button>
+    </div>
   </div>
 </div>
 <div id="toast" class="toast" role="status" hidden></div>
@@ -587,7 +620,7 @@ const DECKS = [
   const blank = () => ({
     v: 1, topics: [], goal: 5, seen: {}, saved: {}, decks: [],
     stashes: [{ id: "s-keep", name: "Keepers" }],
-    theme: "system", rate: 1, updated: 0,
+    theme: "system", rate: 1, muted: false, updated: 0,
   });
   let state = blank();
   let storageOk = true;
@@ -718,9 +751,9 @@ const DECKS = [
   }
 
   // ---------- shared pieces ----------
-  const deckCard = (d) => {
+  const deckCard = (d, a = "open-deck") => {
     const n = ideasOf(d).length, r = readCount(d);
-    return `<button class="deck" style="--h:${hueOf(d)}" data-a="open-deck" data-id="${esc(d.id)}">
+    return `<button class="deck" style="--h:${hueOf(d)}" data-a="${a}" data-id="${esc(d.id)}">
       <span class="eyebrow">${esc(topicName(d))}</span>
       <span class="deck-title">${esc(d.t)}</span>
       <span class="deck-meta">${n} idea${n === 1 ? "" : "s"}${r ? ` · ${r === n ? "finished" : r + " read"}` : ""}</span>
@@ -769,13 +802,14 @@ const DECKS = [
         <h1>${hello}.</h1>
         <p class="lede">${left ? `${left} more idea${left === 1 ? "" : "s"} to reach today's goal.` : "Goal reached. Anything more is a bonus."}
         ${st ? ` You are on a ${st}-day streak.` : ""}</p>
+        <div class="row"><button class="btn" data-a="watch-feed">${icon("play")} Watch today's clips</button></div>
       </div>
       ${ring(done, state.goal)}
     </section>
     ${!state.topics.length ? `<section class="panel"><h2>What are you curious about?</h2>
       <p class="muted">Pick a few topics and Today will lean toward them. Skip this and you get a mix of everything.</p>${topicChips()}</section>` : ""}
     ${due ? `<a class="nudge" href="#review"><strong>${due} saved idea${due === 1 ? " is" : "s are"} due for review.</strong> <span>Two minutes keeps them from fading.</span></a>` : ""}
-    <section><h2>Today's reads</h2><div class="decks">${todaysDecks().map(deckCard).join("")}</div></section>
+    <section><h2>Today's reads</h2><div class="decks">${todaysDecks().map((d) => deckCard(d)).join("")}</div></section>
     ${iod ? `<section><h2>One idea for right now</h2>
       <article class="feature" style="--h:${hueOf(iod.deck)}">
         <p class="eyebrow">${esc(topicName(iod.deck))} · ${esc(iod.deck.t)}</p>
@@ -783,6 +817,20 @@ const DECKS = [
         <div class="row"><button class="btn" data-a="open-idea" data-id="${esc(iod.id)}">Read the full set</button>
         <button class="btn ghost" data-a="quick-save" data-id="${esc(iod.id)}">${state.saved[iod.id] ? "Saved" : "Save"}</button></div>
       </article></section>` : ""}`;
+  }
+
+  function watchFeed() {
+    const first = todaysDecks();
+    const rest = DECKS.filter((d) => !first.includes(d) && (!state.topics.length || state.topics.includes(d.topic)));
+    const all = first.concat(rest).flatMap(ideasOf);
+    const unseen = all.filter((i) => !state.seen[i.id]);
+    return unseen.length ? unseen : all;
+  }
+  function viewWatch() {
+    return `<h1>Watch</h1>
+    <p class="lede">Every idea plays as a short narrated clip with captions, about 20 seconds each. Swipe up for the next one, tap to pause.</p>
+    <div class="row"><button class="btn big" data-a="watch-feed">${icon("play")} Play today's clips</button></div>
+    <section><h2>Or pick a set to watch</h2><div class="decks">${allDecks().filter((d) => ideasOf(d).length).map((d) => deckCard(d, "watch-deck")).join("")}</div></section>`;
   }
 
   function searchIdeas(q) {
@@ -817,7 +865,7 @@ const DECKS = [
       <h2>Library</h2>
       <div class="chips"><button class="chip${!ui.topic ? " on" : ""}" data-a="filter-topic" data-id="">All</button>
       ${TOPICS.map((t) => `<button class="chip${ui.topic === t.id ? " on" : ""}" style="--h:${t.hue}" data-a="filter-topic" data-id="${t.id}">${esc(t.name)}</button>`).join("")}</div>
-      <div class="decks">${decks.map(deckCard).join("")}</div>
+      <div class="decks">${decks.map((d) => deckCard(d)).join("")}</div>
     </section>`;
   }
 
@@ -935,7 +983,7 @@ const DECKS = [
     </section>`;
   }
 
-  const views = { today: viewToday, explore: viewExplore, library: viewLibrary, review: viewReview, you: viewYou };
+  const views = { today: viewToday, watch: viewWatch, explore: viewExplore, library: viewLibrary, review: viewReview, you: viewYou };
   const route = () => (views[location.hash.slice(1)] ? location.hash.slice(1) : "today");
   function render() {
     const r = route();
@@ -1154,8 +1202,233 @@ const DECKS = [
     return addDeck(title, "From text you pasted", cards);
   }
 
+  // ---------- clips (watch mode) ----------
+  // Each idea becomes a short clip: a title scene, then one captioned scene per sentence,
+  // drawn on a canvas so the same renderer can play it and record it to a video file.
+  const V = { items: [], i: 0, clip: null, scene: 0, t0: 0, dur: 1, token: 0, paused: false, open: false, noVoice: false, done: false, raf: 0, rec: false, cache: {} };
+  const estDur = (seg) => Math.max(1.5, (words(seg).length * 0.37) / state.rate + 0.6);
+  const makeClip = (it) => ({ it, hue: hueOf(it.deck), segs: [it.title].concat(sentences(it.body).map((x) => x.trim()).filter(Boolean)) });
+  const fam = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim() || "sans-serif";
+
+  function fitText(ctx, text, font, weight, maxW, maxH, maxSize, minSize) {
+    const ws = words(text);
+    for (let size = maxSize; ; size -= 3) {
+      ctx.font = `${weight} ${size}px ${font}`;
+      const lh = size * 1.2, space = ctx.measureText(" ").width, out = [];
+      let x = 0, y = 0, wide = false;
+      for (const w of ws) {
+        const wd = ctx.measureText(w).width;
+        if (x && x + wd > maxW) { x = 0; y += lh; }
+        out.push({ w, x, y });
+        x += wd + space;
+        if (wd > maxW) wide = true; // a single word is too wide at this size
+      }
+      if ((y + lh <= maxH && !wide) || size <= minSize) return { size, weight, font, words: out, h: (out.length ? out[out.length - 1].y : 0) + lh };
+    }
+  }
+  function drawClip(ctx, W, H, clip, scene, p, T, label, cache) {
+    const h = clip.hue, u = W / 100, padX = 8 * u;
+    // moving backdrop in the topic's hue
+    ctx.fillStyle = `hsl(${h} 42% 11%)`; ctx.fillRect(0, 0, W, H);
+    for (let k = 0; k < 4; k++) {
+      const cx = W * (0.5 + 0.42 * Math.sin(T * (0.11 + k * 0.045) + k * 2.1));
+      const cy = H * (0.5 + 0.42 * Math.cos(T * (0.09 + k * 0.035) + k * 1.3));
+      const r = W * (0.5 + 0.12 * k);
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, `hsla(${(h + k * 28 - 30 + 360) % 360} 75% ${46 - k * 5}% / 0.5)`);
+      g.addColorStop(1, `hsla(${h} 75% 30% / 0)`);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    }
+    ctx.textBaseline = "top";
+    // scene progress segments
+    const n = clip.segs.length, gap = u, segW = (W - 2 * padX - gap * (n - 1)) / n, top = 5 * u;
+    for (let k = 0; k < n; k++) {
+      const x = padX + k * (segW + gap);
+      ctx.fillStyle = "rgba(255,255,255,0.25)"; ctx.fillRect(x, top, segW, 0.8 * u);
+      const f = k < scene ? 1 : k === scene ? p : 0;
+      ctx.fillStyle = "#ffbd2e"; ctx.fillRect(x, top, segW * f, 0.8 * u);
+    }
+    const text = fam("--text"), disp = fam("--display");
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    ctx.font = `600 ${3.3 * u}px ${text}`;
+    ctx.fillText(topicName(clip.it.deck).toUpperCase(), padX, top + 4 * u);
+    const key = `${clip.it.id}|${scene}|${W}|${H}`;
+    const areaTop = top + 14 * u, areaH = H - areaTop - 22 * u, maxW = W - 2 * padX - 12 * u;
+    if (scene === 0) {
+      const L = cache[key] || (cache[key] = fitText(ctx, clip.segs[0], disp, 700, W - 2 * padX, areaH, 13 * u, 6 * u));
+      ctx.font = `${L.weight} ${L.size}px ${L.font}`;
+      const y0 = areaTop + (areaH - L.h) / 2;
+      L.words.forEach((wd, k) => {
+        const a = Math.max(0, Math.min(1, (p * 1.8 * L.words.length - k) / 1.2 + (p > 0.6 ? 1 : 0)));
+        ctx.globalAlpha = a; ctx.fillStyle = "#fff";
+        ctx.fillText(wd.w, padX + wd.x, y0 + wd.y + (1 - a) * 2 * u);
+      });
+      ctx.globalAlpha = 1;
+    } else {
+      const tl = cache[key + "t"] || (cache[key + "t"] = fitText(ctx, clip.segs[0], disp, 650, maxW, 12 * u, 4.6 * u, 3.4 * u));
+      const aTop = areaTop + tl.h + 4 * u, aH = H - aTop - 22 * u;
+      const L = cache[key] || (cache[key] = fitText(ctx, clip.segs[scene], disp, 600, maxW, aH, 8.6 * u, 4.2 * u));
+      ctx.font = `${tl.weight} ${tl.size}px ${tl.font}`; ctx.fillStyle = "#ffbd2e";
+      tl.words.forEach((wd) => ctx.fillText(wd.w, padX + wd.x, areaTop + wd.y));
+      ctx.font = `${L.weight} ${L.size}px ${L.font}`;
+      const y0 = aTop + Math.max(0, (aH - L.h) / 2.6), lit = p * 1.12 * L.words.length;
+      L.words.forEach((wd, k) => {
+        ctx.fillStyle = k < lit ? "#fff" : "rgba(255,255,255,0.32)";
+        ctx.fillText(wd.w, padX + wd.x, y0 + wd.y);
+      });
+    }
+    ctx.fillStyle = "rgba(255,255,255,0.75)";
+    ctx.font = `500 ${3.1 * u}px ${text}`;
+    const foot = fitText(ctx, clip.it.deck.t + (label ? "  ·  " + label : ""), text, 500, maxW, 9 * u, 3.1 * u, 3.1 * u);
+    foot.words.forEach((wd) => ctx.fillText(wd.w, padX + wd.x, H - 15 * u + wd.y));
+  }
+
+  function hush() {
+    try { caps.tts && caps.tts.stop(); } catch {}
+    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch {}
+  }
+  function sizeWatch() {
+    const box = $("#watch"), c = $("#watch-canvas"), stage = $("#watch-stage");
+    const H = box.clientHeight, W = Math.min(box.clientWidth, Math.round((H * 9) / 16));
+    stage.style.width = W + "px";
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+    V.cache = {};
+  }
+  function openWatch(items, i = 0) {
+    if (!items.length) return;
+    if (R.open) { stopSpeak(); R.open = false; $("#reader").hidden = true; }
+    Object.assign(V, { items, open: true, paused: false, done: false, noVoice: false });
+    $("#watch").hidden = false;
+    document.body.classList.add("locked");
+    sizeWatch();
+    $("#w-export").hidden = !(window.MediaRecorder && HTMLCanvasElement.prototype.captureStream);
+    startClip(i);
+    cancelAnimationFrame(V.raf);
+    V.raf = requestAnimationFrame(frame);
+    $("#watch").focus();
+  }
+  function closeWatch() {
+    V.open = false; V.token++; hush();
+    cancelAnimationFrame(V.raf);
+    $("#watch").hidden = true;
+    document.body.classList.remove("locked");
+    render();
+  }
+  function startClip(i) {
+    V.i = i; V.clip = makeClip(V.items[i]); V.scene = 0; V.done = false;
+    markSeen(V.items[i]);
+    $("#watch-live").textContent = `${V.items[i].title}. ${V.items[i].body}`;
+    syncWatchUi();
+    playScene();
+  }
+  function playScene() {
+    const seg = V.clip.segs[V.scene], token = ++V.token;
+    V.t0 = performance.now(); V.dur = estDur(seg); V.spoken = false;
+    if (state.muted || V.noVoice || V.paused) return;
+    V.spoken = true;
+    hush();
+    speakText(seg).then(() => { if (token === V.token) advance(); })
+      .catch(() => { if (token === V.token) { V.noVoice = true; V.spoken = false; V.t0 = performance.now(); syncWatchUi(); } });
+  }
+  function advance() {
+    if (V.scene + 1 < V.clip.segs.length) { V.scene++; playScene(); }
+    else if (V.i + 1 < V.items.length) startClip(V.i + 1);
+    else { V.done = true; V.paused = true; V.token++; syncWatchUi(); }
+  }
+  function frame(now) {
+    if (!V.open) return;
+    V.raf = requestAnimationFrame(frame);
+    if (V.rec) return;
+    const c = $("#watch-canvas"), el = (now - V.t0) / 1000;
+    let p = V.paused ? (V.done ? 1 : 0.02) : Math.min(1, el / V.dur);
+    if (!V.paused && !V.spoken && el >= V.dur) { advance(); p = 0; }
+    // if a voice stalls far past its estimate, move on
+    if (!V.paused && V.spoken && el > V.dur * 2.5 + 4) advance();
+    drawClip(c.getContext("2d"), c.width, c.height, V.clip, V.scene, p, now / 1000, `${V.i + 1} of ${V.items.length}`, V.cache);
+  }
+  function watchStep(d) {
+    const n = V.i + d;
+    if (n < 0 || n >= V.items.length) return;
+    V.paused = false; hush(); startClip(n);
+  }
+  function togglePause() {
+    if (V.done) { V.paused = false; startClip(0); return; }
+    V.paused = !V.paused;
+    if (V.paused) { V.token++; hush(); } else playScene();
+    syncWatchUi();
+  }
+  function syncWatchUi() {
+    const it = V.items[V.i], s = state.saved[it.id];
+    $("#w-save").classList.toggle("on", !!s);
+    $("#w-save .lbl").textContent = s ? "Saved" : "Save";
+    const quiet = state.muted || V.noVoice;
+    $("#w-sound .lbl").textContent = V.noVoice ? "No voice" : quiet ? "Sound off" : "Sound on";
+    $("#w-sound").classList.toggle("on", !quiet);
+    const pz = $("#watch-paused");
+    pz.hidden = !V.paused;
+    pz.textContent = V.done ? "That was the last clip. Tap to replay." : "Paused. Tap to play.";
+  }
+  async function exportClip() {
+    if (V.rec) return;
+    const type = ["video/mp4", "video/webm;codecs=vp9", "video/webm"].find((t) => MediaRecorder.isTypeSupported(t));
+    if (!type) { toast("This browser cannot record video."); return; }
+    if (!V.paused) togglePause();
+    V.rec = true;
+    const clip = V.clip, c = document.createElement("canvas");
+    c.width = 720; c.height = 1280;
+    const ctx = c.getContext("2d"), cache = {}, chunks = [];
+    const rec = new MediaRecorder(c.captureStream(30), { mimeType: type, videoBitsPerSecond: 2500000 });
+    rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    const durs = clip.segs.map(estDur), total = durs.reduce((a, b) => a + b, 0) + 0.6;
+    const lbl = $("#w-export .lbl");
+    const stopped = new Promise((res) => (rec.onstop = res));
+    rec.start();
+    const t0 = performance.now();
+    await new Promise((res) => {
+      const tick = (now) => {
+        const t = (now - t0) / 1000;
+        if (t >= total || !V.open) return res();
+        let k = 0, acc = 0;
+        while (k < durs.length - 1 && t > acc + durs[k]) acc += durs[k++];
+        drawClip(ctx, 720, 1280, clip, k, Math.min(1, (t - acc) / durs[k]), t, "", cache);
+        lbl.textContent = Math.round((t / total) * 100) + "%";
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+    rec.stop(); await stopped;
+    V.rec = false; lbl.textContent = "Get video";
+    if (!V.open) return;
+    const name = clip.it.title.replace(/[^\w ]+/g, "").trim().replace(/\s+/g, "-").toLowerCase() || "idea";
+    saveFile(`${name}.${type.startsWith("video/mp4") ? "mp4" : "webm"}`, new Blob(chunks, { type: type.split(";")[0] }));
+  }
+
   // ---------- actions ----------
   const act = {
+    "watch-feed"() { openWatch(watchFeed(), 0); },
+    "watch-deck"(el) {
+      const d = deckById(el.dataset.id); if (!d) return;
+      const items = ideasOf(d), first = items.findIndex((i) => !state.seen[i.id]);
+      openWatch(items, first < 0 ? 0 : first);
+    },
+    "watch-here"() { openWatch(R.items.slice(), R.end ? 0 : R.i); },
+    "watch-close": closeWatch,
+    "watch-toggle": togglePause,
+    "watch-prev"() { watchStep(-1); },
+    "watch-next"() { watchStep(1); },
+    "watch-save"() {
+      const id = V.items[V.i].id;
+      if (state.saved[id]) delete state.saved[id]; else { ensureSaved(id); toast("Saved. It will come up in Review tomorrow."); }
+      save(); syncWatchUi();
+    },
+    "watch-sound"() {
+      if (V.noVoice) { toast("This browser has no reading voice, so clips play with captions only."); return; }
+      state.muted = !state.muted; save();
+      if (!V.paused) { hush(); playScene(); }
+      syncWatchUi();
+    },
+    "watch-export": () => exportClip(),
     "open-deck"(el) {
       const d = deckById(el.dataset.id); if (!d) return;
       const items = ideasOf(d);
@@ -1326,6 +1599,14 @@ const DECKS = [
   });
 
   document.addEventListener("keydown", (e) => {
+    if (V.open) {
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); watchStep(1); }
+      else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); watchStep(-1); }
+      else if (e.key === " " && e.target.tagName !== "BUTTON") { e.preventDefault(); togglePause(); }
+      else if (e.key.toLowerCase() === "m") act["watch-sound"]();
+      else if (e.key === "Escape") closeWatch();
+      return;
+    }
     if (!R.open || /TEXTAREA|INPUT/.test(e.target.tagName)) return;
     if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); step(1); }
     else if (e.key === "ArrowLeft") step(-1);
@@ -1340,6 +1621,15 @@ const DECKS = [
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
     tx = null;
   });
+
+  let wy = null;
+  $("#watch").addEventListener("touchstart", (e) => { wy = e.touches[0].clientY; }, { passive: true });
+  $("#watch").addEventListener("touchend", (e) => {
+    if (wy === null) return;
+    const dy = e.changedTouches[0].clientY - wy; wy = null;
+    if (Math.abs(dy) > 60) watchStep(dy < 0 ? 1 : -1);
+  });
+  window.addEventListener("resize", () => { if (V.open) sizeWatch(); });
 
   window.addEventListener("hashchange", () => { ui.err = ""; ui.confirmReset = false; render(); window.scrollTo(0, 0); });
   applyTheme();

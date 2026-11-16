@@ -9,6 +9,7 @@ Open `index.html` in any browser. It is a single self-contained file, so it also
 ## What it does
 
 - **Today**: three sets picked for you each day, a daily goal ring, and a streak.
+- **Watch**: every idea plays as a short narrated clip with animated captions, in a swipe-up feed. Any clip can be downloaded as a video file (captions only, no audio track).
 - **Explore**: 150+ original cards across 12 topics, with search.
 - **Learn anything**: type a subject and get a new set of cards (built from Wikipedia; written by Claude when run as a Claude artifact).
 - **Stash**: unlimited saving, any number of stashes, a note on every card.

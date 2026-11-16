@@ -6,6 +6,7 @@
     </a>
     <nav class="tabs" aria-label="Sections">
       <a href="#today" data-nav="today">Today</a>
+      <a href="#watch" data-nav="watch">Watch</a>
       <a href="#explore" data-nav="explore">Explore</a>
       <a href="#library" data-nav="library">Stash</a>
       <a href="#review" data-nav="review">Review<span id="due-badge" class="badge" hidden></span></a>
@@ -30,6 +31,7 @@
     <button class="tool" id="act-save" data-a="save"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg><span class="lbl">Save</span></button>
     <button class="tool" id="act-listen" data-a="listen"></button>
     <button class="tool" data-a="note"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 20h4L20 8l-4-4L4 16zM14 6l4 4"/></svg><span class="lbl">Note</span></button>
+    <button class="tool" data-a="watch-here"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M10 9l5 3-5 3z"/></svg><span class="lbl">Watch</span></button>
     <div class="share-wrap">
       <button class="tool" data-a="share" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 13v7h14v-7"/></svg><span class="lbl">Share</span></button>
       <div id="share-menu" class="menu" hidden>
@@ -38,6 +40,21 @@
       </div>
     </div>
     <button class="btn next-btn" data-a="next">Next</button>
+  </div>
+</div>
+<div id="watch" class="watch" role="dialog" aria-modal="true" aria-label="Clip player" tabindex="-1" hidden>
+  <div id="watch-stage" class="w-stage">
+    <canvas id="watch-canvas" data-a="watch-toggle" aria-hidden="true"></canvas>
+    <p id="watch-live" class="sr" aria-live="polite"></p>
+    <p id="watch-paused" class="w-paused" data-a="watch-toggle" hidden></p>
+    <button class="w-btn w-close" data-a="watch-close" aria-label="Close player"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    <div class="w-rail">
+      <button class="w-btn" id="w-save" data-a="watch-save"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg><span class="lbl">Save</span></button>
+      <button class="w-btn" id="w-sound" data-a="watch-sound"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9zM17 9a4 4 0 010 6"/></svg><span class="lbl">Sound on</span></button>
+      <button class="w-btn" id="w-export" data-a="watch-export"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg><span class="lbl">Get video</span></button>
+      <button class="w-btn" data-a="watch-prev" aria-label="Previous clip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l7-7 7 7"/></svg></button>
+      <button class="w-btn" data-a="watch-next" aria-label="Next clip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg></button>
+    </div>
   </div>
 </div>
 <div id="toast" class="toast" role="status" hidden></div>
